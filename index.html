@@ -1,249 +1,435 @@
-from pathlib import Path
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#15172b">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#10152b">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Nimo — Meu Pequeno Companheiro</title>
+<title>NIMO - Meu Companheiro</title>
 <style>
-  :root{
-    --bg:#101226; --panel:#191c38; --panel2:#22264a; --text:#fff;
-    --muted:#aeb4d6; --accent:#7c5cff; --accent2:#26d9c4; --danger:#ff5d73;
-    --gold:#ffd166; --shadow:0 14px 35px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  button{font:inherit;border:0;color:inherit;cursor:pointer}
-  .app{height:100dvh;max-width:520px;margin:auto;display:flex;flex-direction:column;background:
-    radial-gradient(circle at 50% 5%,#313668 0,#15182d 42%,#0e1020 100%);position:relative}
-  header{padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .brand{font-weight:900;font-size:21px;letter-spacing:.4px}.brand span{color:var(--accent2)}
-  .coins{background:#0c0f20;border:1px solid #30365f;border-radius:16px;padding:7px 11px;font-weight:800;color:var(--gold)}
-  main{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 12px 8px;overflow:hidden}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 8px}
-  .stat{background:rgba(25,28,56,.82);border:1px solid #30365f;border-radius:14px;padding:7px 8px}
-  .stat-top{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:800}
-  .bar{height:7px;background:#0d1021;border-radius:99px;margin-top:5px;overflow:hidden}
-  .fill{height:100%;border-radius:99px;transition:width .35s}
-  .health{background:#ff5d73}.hunger{background:#ffb84d}.energy{background:#26d9c4}
-  .room{flex:1;min-height:0;border-radius:28px;position:relative;overflow:hidden;
-    background:linear-gradient(#30396b 0 62%,#79513f 62% 100%);box-shadow:var(--shadow);border:1px solid #424a7c}
-  .window{position:absolute;left:10%;top:9%;width:25%;height:23%;border-radius:14px;background:#7ed5ff;border:7px solid #292e54;box-shadow:inset 0 0 0 3px #9ce4ff}
-  .cloud{position:absolute;width:35px;height:14px;border-radius:20px;background:#fff;opacity:.8;top:25%;left:15%}
-  .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
-  .cloud:before{width:18px;height:18px;left:7px;top:-8px}.cloud:after{width:22px;height:22px;right:3px;top:-11px}
-  .shelf{position:absolute;right:8%;top:17%;width:30%;height:9px;background:#5a3a30;border-radius:8px}
-  .plant{position:absolute;right:13%;top:7%;font-size:40px}
-  .rug{position:absolute;bottom:7%;left:18%;width:64%;height:17%;background:#513d69;border-radius:50%;opacity:.9}
-  .pet-shadow{position:absolute;bottom:17%;left:50%;transform:translateX(-50%);width:37%;height:8%;background:rgba(0,0,0,.22);border-radius:50%;filter:blur(4px)}
-  .pet-wrap{position:absolute;left:50%;bottom:20%;transform:translateX(-50%);width:min(62%,270px);aspect-ratio:1;display:flex;align-items:center;justify-content:center;transition:transform .2s}
-  .pet{width:72%;height:72%;background:linear-gradient(145deg,#8d72ff,#6144d9);border:7px solid #3b2a92;border-radius:48% 52% 46% 54%/45% 44% 56% 55%;position:relative;box-shadow:inset -12px -15px 0 rgba(0,0,0,.12),inset 10px 10px 0 rgba(255,255,255,.09),0 15px 30px rgba(0,0,0,.22)}
-  .pet:before,.pet:after{content:"";position:absolute;top:39%;width:16px;height:24px;background:#17182c;border-radius:50%}
-  .pet:before{left:23%}.pet:after{right:23%}
-  .eye-shine{position:absolute;top:42%;left:29%;width:5px;height:7px;border-radius:50%;background:#fff;box-shadow:69px 0 #fff}
-  .mouth{position:absolute;left:50%;top:57%;width:34px;height:17px;transform:translateX(-50%);border-bottom:5px solid #17182c;border-radius:0 0 30px 30px}
-  .blush{position:absolute;top:55%;width:18px;height:8px;background:#ff7790;border-radius:50%;opacity:.7}.blush.l{left:13%}.blush.r{right:13%}
-  .bubble{position:absolute;left:50%;top:4%;transform:translateX(-50%);background:#fff;color:#252747;padding:8px 12px;border-radius:16px;font-weight:800;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.2);display:none;z-index:4}
-  .bubble:after{content:"";position:absolute;bottom:-7px;left:50%;border:7px solid transparent;border-top-color:#fff;border-bottom:0;transform:translateX(-50%)}
-  .room-action{position:absolute;right:10px;bottom:10px;width:46px;height:46px;border-radius:15px;background:#1a1e3caa;border:1px solid #555e92;font-size:22px}
-  .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:8px}
-  .action{background:var(--panel);border:1px solid #30365f;border-radius:17px;padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 7px 15px rgba(0,0,0,.16)}
-  .action:active,.nav:active{transform:scale(.95)}.action .ico{font-size:25px}.action small{font-size:10px;color:var(--muted);font-weight:800}
-  nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px 10px;background:#0d1020;border-top:1px solid #292e50}
-  .nav{background:transparent;padding:5px 2px;color:#8f96bc;font-size:11px;font-weight:800}.nav.active{color:#fff}
-  .nav .nicon{display:block;font-size:22px;margin-bottom:2px}
-  .modal{position:absolute;inset:0;background:rgba(5,7,17,.74);backdrop-filter:blur(6px);display:none;align-items:flex-end;z-index:20}
-  .modal.show{display:flex}
-  .sheet{width:100%;background:#171a34;border:1px solid #373e6c;border-radius:26px 26px 0 0;padding:16px;max-height:80%;overflow:auto}
-  .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sheet h2{margin:0;font-size:20px}
-  .close{width:34px;height:34px;border-radius:12px;background:#282d52}
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .card{background:#202447;border:1px solid #353c69;border-radius:18px;padding:12px}
-  .card button{width:100%;margin-top:9px;background:var(--accent);border-radius:12px;padding:9px;font-weight:900}
-  .card button:disabled{opacity:.45}
-  .item-icon{font-size:34px}.price{color:var(--gold);font-weight:900}
-  .mission{display:flex;align-items:center;gap:10px;background:#202447;border-radius:15px;padding:11px;margin:8px 0}.mission .mi{font-size:25px}
-  .mission p{margin:0;flex:1;font-size:13px}.mission b{color:var(--gold)}
-  .toast{position:absolute;left:50%;bottom:94px;transform:translate(-50%,20px);background:#fff;color:#20233f;padding:10px 15px;border-radius:14px;font-weight:900;opacity:0;pointer-events:none;transition:.25s;z-index:30;white-space:nowrap}
-  .toast.show{opacity:1;transform:translate(-50%,0)}
-  .sleep{filter:brightness(.65)}.sleep .pet{animation:breathe 2.2s infinite ease-in-out}
-  @keyframes breathe{50%{transform:scale(.97)}}
-  .heart{position:absolute;font-size:22px;animation:float 1s forwards;pointer-events:none}
-  @keyframes float{to{transform:translateY(-90px) scale(1.4);opacity:0}}
-  @media (max-height:650px){.pet-wrap{bottom:17%;width:min(48%,220px)}.room{min-height:260px}.actions{padding-top:6px}.action{padding:5px}.action .ico{font-size:21px}}
+:root{
+  --bg:#0d1124;
+  --panel:#171c36;
+  --panel2:#20274a;
+  --line:#353e6b;
+  --text:#f7f8ff;
+  --muted:#aeb6d8;
+  --purple:#785cff;
+  --cyan:#29dec5;
+  --yellow:#ffd166;
+  --red:#ff5f78;
+  --orange:#ffb347;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text)}
+body{display:flex;justify-content:center}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.app{
+  width:100%;max-width:520px;height:100dvh;display:flex;flex-direction:column;
+  background:radial-gradient(circle at 50% 0%,#303969 0,#171a32 40%,#0c1020 100%);
+}
+header{
+  min-height:62px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-shrink:0;
+}
+.logo{font-size:22px;font-weight:1000;letter-spacing:1px}
+.logo i{font-style:normal;color:var(--cyan)}
+.money{background:#0a0e1e;border:1px solid var(--line);padding:8px 12px;border-radius:15px;font-weight:900;color:var(--yellow)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 11px 8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px;flex-shrink:0}
+.stat{background:#171b35dd;border:1px solid var(--line);border-radius:14px;padding:7px 8px}
+.stat-title{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-weight:900}
+.bar{height:7px;background:#0b0f20;border-radius:20px;overflow:hidden;margin-top:5px}
+.fill{height:100%;border-radius:20px;transition:width .35s}
+.health{background:var(--red)}.hunger{background:var(--orange)}.energy{background:var(--cyan)}
+.room{
+  flex:1;min-height:240px;position:relative;overflow:hidden;border-radius:28px;
+  border:1px solid #46517e;box-shadow:0 18px 40px #0007;
+  background:linear-gradient(to bottom,#374477 0 60%,#77503d 60% 100%);
+}
+.window{position:absolute;left:9%;top:9%;width:26%;height:24%;background:#7edcff;border:7px solid #292f57;border-radius:16px;overflow:hidden}
+.sun{position:absolute;right:12%;top:15%;width:28px;height:28px;border-radius:50%;background:#ffe38a;box-shadow:0 0 18px #fff0a8}
+.cloud{position:absolute;left:12%;bottom:22%;width:46px;height:15px;border-radius:20px;background:#fff;opacity:.8}
+.cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud:before{width:22px;height:22px;left:7px;top:-10px}.cloud:after{width:27px;height:27px;right:4px;top:-14px}
+.shelf{position:absolute;right:7%;top:20%;width:31%;height:9px;background:#57372e;border-radius:10px}
+.plant{position:absolute;right:10%;top:6%;font-size:42px}
+.picture{position:absolute;right:10%;top:31%;font-size:28px}
+.rug{position:absolute;left:18%;bottom:7%;width:64%;height:17%;background:#4f4168;border-radius:50%;opacity:.9}
+.shadow{position:absolute;left:50%;bottom:18%;width:38%;height:8%;transform:translateX(-50%);border-radius:50%;background:#0004;filter:blur(5px)}
+.pet-wrap{
+  position:absolute;left:50%;bottom:20%;width:min(64%,275px);aspect-ratio:1;
+  transform:translateX(-50%);display:flex;align-items:center;justify-content:center;
+  transition:filter .3s;
+}
+.pet{
+  width:72%;height:72%;position:relative;border-radius:47% 53% 48% 52% / 45% 44% 56% 55%;
+  background:linear-gradient(145deg,#9279ff,#6045d8);border:7px solid #392b91;
+  box-shadow:inset 10px 10px 0 #ffffff12,inset -13px -16px 0 #00000015,0 18px 30px #0003;
+}
+.eye{position:absolute;top:39%;width:17px;height:25px;background:#14162a;border-radius:50%}
+.eye.left{left:22%}.eye.right{right:22%}
+.eye:after{content:"";position:absolute;left:4px;top:4px;width:5px;height:7px;border-radius:50%;background:white}
+.cheek{position:absolute;top:55%;width:19px;height:9px;border-radius:50%;background:#ff7991aa}
+.cheek.left{left:12%}.cheek.right{right:12%}
+.mouth{position:absolute;left:50%;top:57%;width:34px;height:17px;transform:translateX(-50%);border-bottom:5px solid #15172b;border-radius:0 0 30px 30px}
+.ear{position:absolute;top:14%;width:27%;height:28%;background:#6a4bdd;border:6px solid #392b91;z-index:-1}
+.ear.left{left:-3%;transform:rotate(-30deg);border-radius:65% 30% 50% 35%}
+.ear.right{right:-3%;transform:rotate(30deg);border-radius:30% 65% 35% 50%}
+.bubble{
+  display:none;position:absolute;z-index:5;left:50%;top:4%;transform:translateX(-50%);
+  max-width:78%;background:white;color:#252846;padding:9px 13px;border-radius:16px;
+  font-size:13px;font-weight:900;text-align:center;box-shadow:0 8px 20px #0003;
+}
+.bubble:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:#fff;border-bottom:0}
+.speak{
+  position:absolute;right:10px;bottom:10px;width:46px;height:46px;border-radius:15px;
+  background:#171b38cc;border:1px solid #59628f;font-size:21px;
+}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding-top:8px;flex-shrink:0}
+.action{
+  background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:8px 3px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:900;
+  box-shadow:0 7px 15px #0003;
+}
+.action:active,.nav:active{transform:scale(.94)}
+.action span{font-size:24px}.action small{font-size:10px;color:var(--muted)}
+nav{
+  flex-shrink:0;padding:7px 10px calc(7px + env(safe-area-inset-bottom));
+  background:#0b0f20;border-top:1px solid #293052;display:grid;grid-template-columns:repeat(4,1fr);gap:4px
+}
+.nav{background:transparent;color:#8991b8;font-size:10px;font-weight:900;padding:2px}
+.nav.active{color:white}.nav span{display:block;font-size:22px;margin-bottom:1px}
+.modal{
+  display:none;position:absolute;inset:0;z-index:20;background:#050817bb;backdrop-filter:blur(6px);
+  align-items:flex-end;
+}
+.modal.show{display:flex}
+.sheet{
+  width:100%;max-height:82%;overflow:auto;background:#151932;border:1px solid #394271;
+  border-radius:25px 25px 0 0;padding:16px;
+}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet h2{margin:0;font-size:20px}.close{width:36px;height:36px;border-radius:12px;background:#282f53}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.card{background:var(--panel2);border:1px solid #37406c;border-radius:17px;padding:12px}
+.card .icon{font-size:34px}.card p{margin:5px 0;color:var(--muted);font-size:12px;line-height:1.3}
+.card button,.primary{width:100%;padding:9px;border-radius:12px;background:var(--purple);font-weight:1000;margin-top:8px}
+.price{color:var(--yellow);font-weight:1000}
+.mission{display:flex;align-items:center;gap:10px;background:var(--panel2);padding:11px;border-radius:15px;margin-bottom:8px}
+.mission .icon{font-size:25px}.mission p{margin:0;flex:1;font-size:12px}.mission b{color:var(--cyan)}
+.toast{
+  position:absolute;z-index:50;left:50%;bottom:93px;transform:translate(-50%,20px);opacity:0;
+  pointer-events:none;background:white;color:#20233e;border-radius:14px;padding:10px 14px;font-weight:1000;
+  transition:.25s;white-space:nowrap;box-shadow:0 8px 20px #0004
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.heart{position:absolute;z-index:6;font-size:22px;pointer-events:none;animation:floatUp 1s forwards}
+@keyframes floatUp{to{transform:translateY(-85px) scale(1.35);opacity:0}}
+.sleeping{filter:brightness(.6)}
+.sleeping .pet{animation:breathe 2.2s infinite}
+@keyframes breathe{50%{transform:scale(.96)}}
+@media(max-height:650px){
+  header{min-height:52px;padding:7px 12px}.stats{margin-bottom:5px}
+  .pet-wrap{bottom:16%;width:min(52%,220px)}.actions{padding-top:5px}
+  .action{padding:5px}.action span{font-size:21px}.nav span{font-size:19px}
+}
 </style>
 </head>
 <body>
 <div class="app" id="app">
-  <header>
-    <div class="brand">NIMO <span>●</span></div>
-    <div class="coins">🪙 <span id="coins">120</span></div>
-  </header>
+<header>
+  <div class="logo">NIMO <i>●</i></div>
+  <div class="money">🪙 <span id="coins">120</span></div>
+</header>
 
-  <main>
-    <section class="stats">
-      <div class="stat"><div class="stat-top"><span>❤️ Saúde</span><b id="healthTxt">86</b></div><div class="bar"><div id="healthBar" class="fill health"></div></div></div>
-      <div class="stat"><div class="stat-top"><span>🍎 Fome</span><b id="hungerTxt">72</b></div><div class="bar"><div id="hungerBar" class="fill hunger"></div></div></div>
-      <div class="stat"><div class="stat-top"><span>⚡ Energia</span><b id="energyTxt">81</b></div><div class="bar"><div id="energyBar" class="fill energy"></div></div></div>
-    </section>
-
-    <section class="room" id="room">
-      <div class="window"><div class="cloud"></div></div>
-      <div class="plant">🌿</div><div class="shelf"></div><div class="rug"></div>
-      <div class="bubble" id="bubble">Oi! Vamos brincar?</div>
-      <div class="pet-shadow"></div>
-      <div class="pet-wrap" id="petWrap">
-        <div class="pet" id="pet">
-          <div class="eye-shine"></div><div class="blush l"></div><div class="blush r"></div><div class="mouth"></div>
-        </div>
-      </div>
-      <button class="room-action" id="speakBtn" aria-label="Conversar">💬</button>
-    </section>
-
-    <section class="actions">
-      <button class="action" onclick="feed()"><span class="ico">🍎</span><small>Comida</small></button>
-      <button class="action" onclick="play()"><span class="ico">🎮</span><small>Brincar</small></button>
-      <button class="action" onclick="sleepToggle()"><span class="ico" id="sleepIcon">😴</span><small>Dormir</small></button>
-      <button class="action" onclick="bath()"><span class="ico">🛁</span><small>Banho</small></button>
-    </section>
-  </main>
-
-  <nav>
-    <button class="nav active" onclick="closeAll()"><span class="nicon">🏠</span>Casa</button>
-    <button class="nav" onclick="openShop()"><span class="nicon">🛍️</span>Loja</button>
-    <button class="nav" onclick="openGames()"><span class="nicon">🕹️</span>Jogos</button>
-    <button class="nav" onclick="openMissions()"><span class="nicon">🏆</span>Missões</button>
-  </nav>
-
-  <div class="toast" id="toast"></div>
-
-  <div class="modal" id="modal" onclick="if(event.target===this)closeAll()">
-    <div class="sheet">
-      <div class="sheet-head"><h2 id="modalTitle">Loja</h2><button class="close" onclick="closeAll()">✕</button></div>
-      <div id="modalContent"></div>
-    </div>
+<main>
+  <div class="stats">
+    <div class="stat"><div class="stat-title"><span>❤️ Saúde</span><b id="healthTxt">86</b></div><div class="bar"><div id="healthBar" class="fill health"></div></div></div>
+    <div class="stat"><div class="stat-title"><span>🍎 Fome</span><b id="hungerTxt">72</b></div><div class="bar"><div id="hungerBar" class="fill hunger"></div></div></div>
+    <div class="stat"><div class="stat-title"><span>⚡ Energia</span><b id="energyTxt">81</b></div><div class="bar"><div id="energyBar" class="fill energy"></div></div></div>
   </div>
+
+  <section class="room" id="room">
+    <div class="window"><div class="sun"></div><div class="cloud"></div></div>
+    <div class="plant">🌿</div><div class="shelf"></div><div class="picture">🖼️</div>
+    <div class="rug"></div><div class="bubble" id="bubble"></div><div class="shadow"></div>
+    <div class="pet-wrap" id="petWrap">
+      <div class="pet" id="pet">
+        <div class="ear left"></div><div class="ear right"></div>
+        <div class="eye left"></div><div class="eye right"></div>
+        <div class="cheek left"></div><div class="cheek right"></div><div class="mouth"></div>
+      </div>
+    </div>
+    <button class="speak" onclick="talk()">💬</button>
+  </section>
+
+  <div class="actions">
+    <button class="action" onclick="feed()"><span>🍎</span><small>Comida</small></button>
+    <button class="action" onclick="play()"><span>🎮</span><small>Brincar</small></button>
+    <button class="action" onclick="sleepToggle()"><span id="sleepIcon">😴</span><small>Dormir</small></button>
+    <button class="action" onclick="bath()"><span>🛁</span><small>Banho</small></button>
+  </div>
+</main>
+
+<nav>
+  <button class="nav active" onclick="closeModal()"><span>🏠</span>Casa</button>
+  <button class="nav" onclick="shop()"><span>🛍️</span>Loja</button>
+  <button class="nav" onclick="games()"><span>🕹️</span>Jogos</button>
+  <button class="nav" onclick="missions()"><span>🏆</span>Missões</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="modalTitle"></h2><button class="close" onclick="closeModal()">✕</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
 </div>
 
 <script>
 (() => {
-  const state = {
-    coins: Number(localStorage.getItem('nimoCoins')) || 120,
-    health: Number(localStorage.getItem('nimoHealth')) || 86,
-    hunger: Number(localStorage.getItem('nimoHunger')) || 72,
-    energy: Number(localStorage.getItem('nimoEnergy')) || 81,
-    sleeping: false,
-    bathLevel: 75,
-    wins: Number(localStorage.getItem('nimoWins')) || 0,
-    foods: Number(localStorage.getItem('nimoFoods')) || 3
-  };
+"use strict";
 
-  const $ = id => document.getElementById(id);
-  const clamp = n => Math.max(0, Math.min(100, Math.round(n)));
+const state={
+  coins:Number(localStorage.getItem("nimo_coins"))||120,
+  health:Number(localStorage.getItem("nimo_health"))||86,
+  hunger:Number(localStorage.getItem("nimo_hunger"))||72,
+  energy:Number(localStorage.getItem("nimo_energy"))||81,
+  food:Number(localStorage.getItem("nimo_food"))||3,
+  plays:Number(localStorage.getItem("nimo_plays"))||0,
+  baths:Number(localStorage.getItem("nimo_baths"))||0,
+  sleeping:false
+};
 
-  function save(){
-    localStorage.setItem('nimoCoins', state.coins);
-    localStorage.setItem('nimoHealth', state.health);
-    localStorage.setItem('nimoHunger', state.hunger);
-    localStorage.setItem('nimoEnergy', state.energy);
-    localStorage.setItem('nimoWins', state.wins);
-    localStorage.setItem('nimoFoods', state.foods);
-  }
-  function render(){
-    $('coins').textContent=state.coins;
-    ['health','hunger','energy'].forEach(k=>{
-      $(k+'Txt').textContent=clamp(state[k]);
-      $(k+'Bar').style.width=clamp(state[k])+'%';
-    });
-    $('room').classList.toggle('sleep',state.sleeping);
-    $('sleepIcon').textContent=state.sleeping?'☀️':'😴';
-    save();
-  }
-  function toast(msg){
-    const t=$('toast');t.textContent=msg;t.classList.add('show');
-    clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove('show'),1500);
-  }
-  function bubble(msg){
-    $('bubble').textContent=msg;$('bubble').style.display='block';
-    clearTimeout(window.bubbleTimer);window.bubbleTimer=setTimeout(()=>$('bubble').style.display='none',2200);
-  }
-  function hearts(){
-    for(let i=0;i<3;i++){const h=document.createElement('div');h.className='heart';h.textContent='💜';
-      h.style.left=(42+Math.random()*16)+'%';h.style.bottom=(25+Math.random()*15)+'%';$('room').appendChild(h);
-      setTimeout(()=>h.remove(),1000)}
-  }
-  function petBounce(){ $('petWrap').animate([{transform:'translateX(-50%) scale(1)'},{transform:'translateX(-50%) scale(1.08)'},{transform:'translateX(-50%) scale(1)'}],{duration:420}); }
+const $=id=>document.getElementById(id);
+const clamp=n=>Math.max(0,Math.min(100,Math.round(n)));
 
-  window.feed=function(){
-    if(state.sleeping){bubble('Estou dormindo... 😴');return}
-    if(state.foods<=0){openShop();toast('Acabou a comida!');return}
-    state.foods--;state.hunger+=16;state.health+=2;state.coins+=3;render();petBounce();hearts();bubble('Hmmm! Delícia! 🍎');toast('+16 fome • +3 moedas');
-  }
-  window.play=function(){
-    if(state.sleeping){bubble('Zzz...');return}
-    if(state.energy<12){bubble('Estou cansado! ⚡');toast('Preciso descansar.');return}
-    state.energy-=12;state.hunger-=5;state.health+=1;state.coins+=8;state.wins++;
-    render();petBounce();bubble('Isso foi divertido! 🎮');toast('+8 moedas');
-  }
-  window.sleepToggle=function(){
-    state.sleeping=!state.sleeping;
-    if(state.sleeping){bubble('Boa noite! 🌙');toast('Nimo foi dormir.')}
-    else{state.energy+=35;state.health+=5;bubble('Bom dia! ☀️');toast('Nimo descansou!');}
-    render();
-  }
-  window.bath=function(){
-    if(state.sleeping){bubble('Depois do meu cochilo...');return}
-    state.health+=7;state.energy-=3;state.coins+=4;state.bathLevel=100;render();bubble('Agora estou limpinho! 🫧');toast('+7 saúde • +4 moedas');
-  }
-  window.closeAll=function(){$('modal').classList.remove('show')}
-  window.openShop=function(){
-    $('modalTitle').textContent='🛍️ Loja do Nimo';
-    $('modalContent').innerHTML=`
-      <div class="grid">
-        <div class="card"><div class="item-icon">🍎</div><b>Maçã</b><p>Recupera 16 de fome.</p><span class="price">🪙 10</span><button onclick="buyFood()">Comprar</button></div>
-        <div class="card"><div class="item-icon">🍕</div><b>Pizza</b><p>Recupera 30 de fome.</p><span class="price">🪙 25</span><button onclick="buyPizza()">Comprar</button></div>
-        <div class="card"><div class="item-icon">🎩</div><b>Chapéu Neon</b><p>Visual exclusivo para Nimo.</p><span class="price">🪙 80</span><button onclick="buyItem('chapéu',80)">Comprar</button></div>
-        <div class="card"><div class="item-icon">🛹</div><b>Skate Lunar</b><p>Desbloqueia um novo visual.</p><span class="price">🪙 120</span><button onclick="buyItem('skate',120)">Comprar</button></div>
-      </div>`;
-    $('modal').classList.add('show');
-  }
-  window.buyFood=function(){if(state.coins<10)return toast('Moedas insuficientes!');state.coins-=10;state.foods++;render();toast('🍎 Comida comprada!');}
-  window.buyPizza=function(){if(state.coins<25)return toast('Moedas insuficientes!');state.coins-=25;state.hunger+=30;render();toast('🍕 Nimo comeu pizza!');}
-  window.buyItem=function(name,cost){if(state.coins<cost)return toast('Moedas insuficientes!');state.coins-=cost;render();bubble(name==='chapéu'?'Uau! Que estilo! 😎':'Bora andar de skate! 🛹');toast('Item desbloqueado!');}
+function save(){
+  localStorage.setItem("nimo_coins",state.coins);
+  localStorage.setItem("nimo_health",state.health);
+  localStorage.setItem("nimo_hunger",state.hunger);
+  localStorage.setItem("nimo_energy",state.energy);
+  localStorage.setItem("nimo_food",state.food);
+  localStorage.setItem("nimo_plays",state.plays);
+  localStorage.setItem("nimo_baths",state.baths);
+}
 
-  window.openGames=function(){
-    $('modalTitle').textContent='🕹️ Mini-jogos';
-    $('modalContent').innerHTML=`
-      <div class="card" style="margin-bottom:10px"><div class="item-icon">🎯</div><b>Toque no Alvo</b><p>Faça 10 toques rápidos para ganhar moedas.</p><button onclick="targetGame()">Jogar por 🪙 5</button></div>
-      <div class="card"><div class="item-icon">🧠</div><b>Memória Relâmpago</b><p>Um desafio simples de memória.</p><button onclick="memoryGame()">Jogar por 🪙 5</button></div>`;
-    $('modal').classList.add('show');
-  }
-  window.targetGame=function(){if(state.coins<5)return toast('Moedas insuficientes!');state.coins-=5;render();let score=Number(prompt('Quantos alvos você acertou? Digite de 0 a 10:'));if(Number.isNaN(score))return;if(score<0)score=0;if(score>10)score=10;let reward=score*3;state.coins+=reward;state.energy-=Math.min(10,score);state.wins+=score>=8?1:0;render();toast('Você ganhou 🪙 '+reward+'!');}
-  window.memoryGame=function(){if(state.coins<5)return toast('Moedas insuficientes!');state.coins-=5;render();const answer=Math.floor(Math.random()*4)+1;const start=performance.now();alert('Memorize este número: '+answer);const typed=Number(prompt('Qual era o número?'));const reward=typed===answer?25:0;state.coins+=reward;state.wins+=typed===answer?1:0;render();toast(typed===answer?'🧠 Perfeito! +25 moedas':'Quase! Tente novamente.');}
+function render(){
+  $("coins").textContent=state.coins;
+  ["health","hunger","energy"].forEach(k=>{
+    $(k+"Txt").textContent=clamp(state[k]);
+    $(k+"Bar").style.width=clamp(state[k])+"%";
+  });
+  $("room").classList.toggle("sleeping",state.sleeping);
+  $("sleepIcon").textContent=state.sleeping?"☀️":"😴";
+  save();
+}
 
-  window.openMissions=function(){
-    $('modalTitle').textContent='🏆 Missões';
-    $('modalContent').innerHTML=`
-      <div class="mission"><span class="mi">🍎</span><p>Alimente Nimo 3 vezes<br><b>${Math.min(state.foods,3)}/3 concluído</b></p><strong>🪙 +20</strong></div>
-      <div class="mission"><span class="mi">🎮</span><p>Brinque 5 vezes<br><b>${Math.min(state.wins,5)}/5 pontos</b></p><strong>🪙 +30</strong></div>
-      <div class="mission"><span class="mi">🛁</span><p>Dê um banho caprichado<br><b>1/1 concluído</b></p><strong>🪙 +15</strong></div>
-      <div class="card" style="margin-top:10px"><b>Seu progresso</b><p>🏆 Vitórias: ${state.wins}<br>🍎 Comidas em estoque: ${state.foods}</p></div>`;
-    $('modal').classList.add('show');
-  }
+function toast(msg){
+  const el=$("toast");
+  el.textContent=msg;
+  el.classList.add("show");
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>el.classList.remove("show"),1500);
+}
 
-  $('speakBtn').onclick=()=>{const phrases=['Você é meu melhor amigo! 💜','Vamos explorar? ✨','Estou com fome... 🍎','Que dia bonito! ☀️','Bora jogar! 🎮'];bubble(phrases[Math.floor(Math.random()*phrases.length)]);petBounce();}
-  $('pet').addEventListener('click',()=>{bubble('Hehe! 😄');petBounce();state.health=Math.min(100,state.health+1);render();});
-  setInterval(()=>{if(state.sleeping){state.energy=Math.min(100,state.energy+4);state.health=Math.min(100,state.health+1)}else{state.hunger=Math.max(0,state.hunger-.6);state.energy=Math.max(0,state.energy-.25);if(state.hunger<20)state.health=Math.max(0,state.health-.2)}render()},5000);
+function bubble(msg){
+  const el=$("bubble");
+  el.textContent=msg;
+  el.style.display="block";
+  clearTimeout(window.bubbleTimer);
+  window.bubbleTimer=setTimeout(()=>el.style.display="none",2300);
+}
+
+function bounce(){
+  $("petWrap").animate(
+    [{transform:"translateX(-50%) scale(1)"},{transform:"translateX(-50%) scale(1.08)"},{transform:"translateX(-50%) scale(1)"}],
+    {duration:420,easing:"ease-out"}
+  );
+}
+
+function hearts(){
+  for(let i=0;i<3;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent="💜";
+    h.style.left=(42+Math.random()*16)+"%";
+    h.style.bottom=(25+Math.random()*14)+"%";
+    $("room").appendChild(h);
+    setTimeout(()=>h.remove(),1000);
+  }
+}
+
+window.feed=function(){
+  if(state.sleeping){bubble("Estou dormindo... 😴");return}
+  if(state.food<=0){bubble("Acabou minha comida!");shop();return}
+  state.food--;
+  state.hunger+=16;
+  state.health+=2;
+  state.coins+=3;
+  render();bounce();hearts();
+  bubble("Hmmm! Muito bom! 🍎");
+  toast("+16 fome • +3 moedas");
+};
+
+window.play=function(){
+  if(state.sleeping){bubble("Zzz... 😴");return}
+  if(state.energy<12){bubble("Estou cansado... ⚡");toast("Nimo precisa descansar.");return}
+  state.energy-=12;
+  state.hunger-=5;
+  state.health+=1;
+  state.coins+=8;
+  state.plays++;
+  render();bounce();
+  bubble("Foi divertido! 🎮");
+  toast("+8 moedas");
+};
+
+window.sleepToggle=function(){
+  state.sleeping=!state.sleeping;
+  if(state.sleeping){
+    bubble("Boa noite! 🌙");
+    toast("Nimo foi dormir.");
+  }else{
+    state.energy+=35;
+    state.health+=5;
+    bubble("Bom dia! ☀️");
+    toast("Nimo descansou!");
+  }
   render();
+};
+
+window.bath=function(){
+  if(state.sleeping){bubble("Depois do meu cochilo! 😴");return}
+  state.health+=7;
+  state.energy-=3;
+  state.coins+=4;
+  state.baths++;
+  render();
+  bubble("Agora estou limpinho! 🫧");
+  toast("+7 saúde • +4 moedas");
+};
+
+window.talk=function(){
+  const phrases=[
+    "Você é meu melhor amigo! 💜",
+    "Vamos brincar? 🎮",
+    "Estou com fome... 🍎",
+    "Que dia bonito! ☀️",
+    "Quero uma aventura! ✨",
+    "Você viu minhas orelhinhas? 😄"
+  ];
+  bubble(phrases[Math.floor(Math.random()*phrases.length)]);
+  bounce();
+};
+
+window.shop=function(){
+  $("modalTitle").textContent="🛍️ Loja do Nimo";
+  $("modalContent").innerHTML=`
+    <div class="grid">
+      <div class="card"><div class="icon">🍎</div><b>Maçã</b><p>Adiciona 1 comida ao estoque.</p><span class="price">🪙 10</span><button onclick="buyApple()">Comprar</button></div>
+      <div class="card"><div class="icon">🍕</div><b>Pizza</b><p>Nimo come na hora e recupera 30 de fome.</p><span class="price">🪙 25</span><button onclick="buyPizza()">Comer</button></div>
+      <div class="card"><div class="icon">🎩</div><b>Chapéu Neon</b><p>Item cosmético exclusivo.</p><span class="price">🪙 80</span><button onclick="buyItem('Chapéu Neon',80)">Comprar</button></div>
+      <div class="card"><div class="icon">🛹</div><b>Skate Lunar</b><p>Item cosmético exclusivo.</p><span class="price">🪙 120</span><button onclick="buyItem('Skate Lunar',120)">Comprar</button></div>
+    </div>`;
+  $("modal").classList.add("show");
+};
+
+window.buyApple=function(){
+  if(state.coins<10){toast("Moedas insuficientes!");return}
+  state.coins-=10;state.food++;render();toast("🍎 Maçã adicionada!");
+};
+
+window.buyPizza=function(){
+  if(state.coins<25){toast("Moedas insuficientes!");return}
+  state.coins-=25;state.hunger+=30;state.health+=3;render();
+  bubble("PIZZA! 🍕");toast("+30 fome");
+};
+
+window.buyItem=function(name,cost){
+  if(state.coins<cost){toast("Moedas insuficientes!");return}
+  state.coins-=cost;render();bubble(name+" desbloqueado! ✨");toast("Item desbloqueado!");
+};
+
+window.games=function(){
+  $("modalTitle").textContent="🕹️ Mini-jogos";
+  $("modalContent").innerHTML=`
+    <div class="card" style="margin-bottom:9px">
+      <div class="icon">🎯</div><b>Desafio do Alvo</b>
+      <p>Escolha um número de 1 a 3. Se acertar, ganha 25 moedas.</p>
+      <button onclick="targetGame()">Jogar por 🪙 5</button>
+    </div>
+    <div class="card">
+      <div class="icon">🔢</div><b>Memória Relâmpago</b>
+      <p>Memorize um número e tente lembrar.</p>
+      <button onclick="memoryGame()">Jogar por 🪙 5</button>
+    </div>`;
+  $("modal").classList.add("show");
+};
+
+window.targetGame=function(){
+  if(state.coins<5){toast("Moedas insuficientes!");return}
+  state.coins-=5;render();
+  const target=Math.floor(Math.random()*3)+1;
+  const answer=Number(prompt("Escolha um número: 1, 2 ou 3"));
+  if(answer===target){
+    state.coins+=25;state.plays++;render();toast("🎯 Acertou! +25 moedas");
+  }else{
+    render();toast("Errou! O número era "+target);
+  }
+};
+
+window.memoryGame=function(){
+  if(state.coins<5){toast("Moedas insuficientes!");return}
+  state.coins-=5;render();
+  const n=Math.floor(Math.random()*900)+100;
+  alert("Memorize: "+n);
+  const answer=prompt("Qual era o número?");
+  if(String(answer)===String(n)){
+    state.coins+=30;state.plays++;render();toast("🧠 Perfeito! +30 moedas");
+  }else{
+    render();toast("Quase! Era "+n);
+  }
+};
+
+window.missions=function(){
+  $("modalTitle").textContent="🏆 Missões";
+  const foodDone=state.food>=3;
+  const playDone=state.plays>=5;
+  const bathDone=state.baths>=1;
+  $("modalContent").innerHTML=`
+    <div class="mission"><span class="icon">🍎</span><p>Tenha 3 comidas no estoque<br><b>${Math.min(state.food,3)}/3</b></p><strong>🪙 20</strong></div>
+    <div class="mission"><span class="icon">🎮</span><p>Brinque ou vença 5 partidas<br><b>${Math.min(state.plays,5)}/5</b></p><strong>🪙 30</strong></div>
+    <div class="mission"><span class="icon">🛁</span><p>Dê um banho em Nimo<br><b>${Math.min(state.baths,1)}/1</b></p><strong>🪙 15</strong></div>
+    <div class="card"><b>Como jogar</b><p>Cuide do Nimo todos os dias. Comida aumenta a fome, brincadeiras gastam energia, banho recupera saúde e dormir recupera energia.</p></div>`;
+  $("modal").classList.add("show");
+};
+
+window.closeModal=function(){$("modal").classList.remove("show")};
+
+$("pet").addEventListener("click",()=>{
+  if(state.sleeping){bubble("Zzz...");return}
+  state.health=Math.min(100,state.health+1);
+  render();bounce();hearts();bubble("Hehehe! 😄");
+});
+
+setInterval(()=>{
+  if(state.sleeping){
+    state.energy=Math.min(100,state.energy+4);
+    state.health=Math.min(100,state.health+1);
+  }else{
+    state.hunger=Math.max(0,state.hunger-.5);
+    state.energy=Math.max(0,state.energy-.2);
+    if(state.hunger<20)state.health=Math.max(0,state.health-.2);
+  }
+  render();
+},5000);
+
+render();
 })();
 </script>
 </body>
 </html>
-'''
-
-path = Path("/mnt/data/index.html")
-path.write_text(html, encoding="utf-8")
-print(f"Arquivo criado: {path}")
