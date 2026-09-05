@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#10152b">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>NIMO - Meu Companheiro</title>
+<title>TERAFIM - Meu Companheiro</title>
 <style>
 :root{
   --bg:#0d1124;
@@ -134,23 +134,75 @@ nav{
   .pet-wrap{bottom:16%;width:min(52%,220px)}.actions{padding-top:5px}
   .action{padding:5px}.action span{font-size:21px}.nav span{font-size:19px}
 }
+
+/* ===== CRIAÇÃO DO APRENDIZ TERAFIM ===== */
+.character-creator{
+  display:none;position:fixed;inset:0;z-index:100;background:#080b18ee;
+  backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:18px;
+}
+.character-creator.show{display:flex}
+.creator-card{
+  width:min(100%,430px);max-height:92dvh;overflow:auto;background:#151932;
+  border:1px solid #46517e;border-radius:28px;padding:22px;
+  box-shadow:0 25px 70px #0008;text-align:center;
+}
+.creator-card h1{margin:0 0 5px;font-size:30px;letter-spacing:2px}
+.creator-card h1 i{font-style:normal;color:var(--cyan)}
+.creator-sub{margin:0 0 18px;color:var(--muted);font-size:13px}
+.character-preview{
+  height:230px;border-radius:22px;background:linear-gradient(to bottom,#374477 0 63%,#77503d 63% 100%);
+  border:1px solid #46517e;position:relative;overflow:hidden;margin-bottom:16px;
+}
+.preview-floor{position:absolute;left:15%;bottom:8%;width:70%;height:22%;background:#4f4168;border-radius:50%}
+.anime-char{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:125px;height:195px}
+.char-hair{position:absolute;left:50%;top:2px;transform:translateX(-50%);width:72px;height:68px;background:#3a275d;border-radius:52% 48% 45% 45%;z-index:3}
+.char-hair:after{content:"";position:absolute;left:8px;top:42px;width:56px;height:35px;background:#3a275d;clip-path:polygon(0 0,100% 0,82% 100%,58% 65%,35% 100%,15% 62%)}
+.char-face{position:absolute;left:50%;top:38px;transform:translateX(-50%);width:58px;height:70px;background:#f3c9aa;border-radius:46% 46% 50% 50%;z-index:2}
+.char-eye{position:absolute;top:30px;width:8px;height:14px;background:#20213a;border-radius:50%}
+.char-eye.l{left:15px}.char-eye.r{right:15px}
+.char-body{position:absolute;left:50%;top:100px;transform:translateX(-50%);width:72px;height:70px;background:#f7f7fb;border:4px solid #d9dbe7;border-radius:15px 15px 8px 8px}
+.char-belt{position:absolute;left:50%;top:151px;transform:translateX(-50%);width:75px;height:9px;background:#4a3026;border-radius:5px;z-index:4}
+.char-leg{position:absolute;top:160px;width:25px;height:34px;background:#151722;border-radius:5px;z-index:3}
+.char-leg.l{left:35px}.char-leg.r{right:35px}
+.char-boot{position:absolute;top:185px;width:34px;height:14px;background:#633f2d;border-radius:5px 8px 5px 5px;z-index:4}
+.char-boot.l{left:27px}.char-boot.r{right:27px}
+.gender-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.gender-btn{
+  background:var(--panel2);border:2px solid #37406c;border-radius:16px;padding:12px;
+  font-weight:1000;font-size:15px;
+}
+.gender-btn.selected{border-color:var(--cyan);box-shadow:0 0 0 2px #29dec533}
+.name-input{
+  width:100%;padding:13px 14px;border-radius:14px;background:#0b0f20;color:white;
+  border:1px solid #394271;outline:none;font-size:15px;margin-bottom:10px;
+}
+.name-input:focus{border-color:var(--cyan)}
+.creator-error{height:18px;color:var(--red);font-size:12px;font-weight:900;margin-bottom:4px}
+.creator-button{width:100%;padding:13px;border-radius:14px;background:var(--purple);font-weight:1000;font-size:15px}
+.char-female .char-hair{background:#6a315f}.char-female .char-hair:after{background:#6a315f}
+.char-female .char-body{border-radius:20px 20px 10px 10px}
+
 </style>
 </head>
 <body>
 <div class="app" id="app">
 <header>
-  <div class="logo">NIMO <i>●</i></div>
+  <div class="logo">TERAFIM <i>✦</i></div>
   <div class="money">🪙 <span id="coins">120</span></div>
 </header>
 
 <main>
-  <div class="stats">
+  <div style="text-align:center;margin:-1px 0 7px;color:var(--muted);font-size:11px;font-weight:900">
+      Aprendiz <span id="playerName">—</span>
+    </div>
+    <div class="stats">
     <div class="stat"><div class="stat-title"><span>❤️ Saúde</span><b id="healthTxt">86</b></div><div class="bar"><div id="healthBar" class="fill health"></div></div></div>
     <div class="stat"><div class="stat-title"><span>🍎 Fome</span><b id="hungerTxt">72</b></div><div class="bar"><div id="hungerBar" class="fill hunger"></div></div></div>
     <div class="stat"><div class="stat-title"><span>⚡ Energia</span><b id="energyTxt">81</b></div><div class="bar"><div id="energyBar" class="fill energy"></div></div></div>
   </div>
 
   <section class="room" id="room">
+     <div id="playerBadge" style="position:absolute;left:10px;top:10px;z-index:7;background:#171b38cc;border:1px solid #59628f;padding:7px 10px;border-radius:12px;font-size:10px;font-weight:900">Aprendiz</div>
     <div class="window"><div class="sun"></div><div class="cloud"></div></div>
     <div class="plant">🌿</div><div class="shelf"></div><div class="picture">🖼️</div>
     <div class="rug"></div><div class="bubble" id="bubble"></div><div class="shadow"></div>
@@ -187,6 +239,35 @@ nav{
     <div id="modalContent"></div>
   </div>
 </div>
+
+<div class="character-creator" id="characterCreator">
+  <div class="creator-card">
+    <h1>TERAFIM <i>✦</i></h1>
+    <p class="creator-sub">Crie seu aprendiz e comece sua jornada.</p>
+
+    <div class="character-preview">
+      <div class="preview-floor"></div>
+      <div class="anime-char" id="creatorPreview">
+        <div class="char-hair"></div>
+        <div class="char-face"><div class="char-eye l"></div><div class="char-eye r"></div></div>
+        <div class="char-body"></div>
+        <div class="char-belt"></div>
+        <div class="char-leg l"></div><div class="char-leg r"></div>
+        <div class="char-boot l"></div><div class="char-boot r"></div>
+      </div>
+    </div>
+
+    <div class="gender-row">
+      <button class="gender-btn selected" id="maleBtn" onclick="selectGender('masculino')">♂️ Masculino</button>
+      <button class="gender-btn" id="femaleBtn" onclick="selectGender('feminino')">♀️ Feminino</button>
+    </div>
+
+    <input class="name-input" id="characterName" maxlength="18" placeholder="Digite o nome do seu aprendiz" autocomplete="off">
+    <div class="creator-error" id="creatorError"></div>
+    <button class="creator-button" onclick="createCharacter()">✨ Começar minha aventura</button>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -194,13 +275,16 @@ nav{
 "use strict";
 
 const state={
-  coins:Number(localStorage.getItem("nimo_coins"))||120,
-  health:Number(localStorage.getItem("nimo_health"))||86,
-  hunger:Number(localStorage.getItem("nimo_hunger"))||72,
-  energy:Number(localStorage.getItem("nimo_energy"))||81,
-  food:Number(localStorage.getItem("nimo_food"))||3,
-  plays:Number(localStorage.getItem("nimo_plays"))||0,
-  baths:Number(localStorage.getItem("nimo_baths"))||0,
+  coins:Number(localStorage.getItem("terafim_coins"))||120,
+  characterName:localStorage.getItem("terafim_character_name")||"",
+  gender:localStorage.getItem("terafim_gender")||"",
+  initialized:localStorage.getItem("terafim_initialized")==="1",
+  health:Number(localStorage.getItem("terafim_health"))||86,
+  hunger:Number(localStorage.getItem("terafim_hunger"))||72,
+  energy:Number(localStorage.getItem("terafim_energy"))||81,
+  food:Number(localStorage.getItem("terafim_food"))||3,
+  plays:Number(localStorage.getItem("terafim_plays"))||0,
+  baths:Number(localStorage.getItem("terafim_baths"))||0,
   sleeping:false
 };
 
@@ -208,17 +292,53 @@ const $=id=>document.getElementById(id);
 const clamp=n=>Math.max(0,Math.min(100,Math.round(n)));
 
 function save(){
-  localStorage.setItem("nimo_coins",state.coins);
-  localStorage.setItem("nimo_health",state.health);
-  localStorage.setItem("nimo_hunger",state.hunger);
-  localStorage.setItem("nimo_energy",state.energy);
-  localStorage.setItem("nimo_food",state.food);
-  localStorage.setItem("nimo_plays",state.plays);
-  localStorage.setItem("nimo_baths",state.baths);
+  localStorage.setItem("terafim_coins",state.coins);
+  localStorage.setItem("terafim_health",state.health);
+  localStorage.setItem("terafim_hunger",state.hunger);
+  localStorage.setItem("terafim_energy",state.energy);
+  localStorage.setItem("terafim_food",state.food);
+  localStorage.setItem("terafim_plays",state.plays);
+  localStorage.setItem("terafim_baths",state.baths);
 }
+
+
+let selectedGender = state.gender || "masculino";
+
+function selectGender(gender){
+  selectedGender=gender;
+  $("maleBtn").classList.toggle("selected",gender==="masculino");
+  $("femaleBtn").classList.toggle("selected",gender==="feminino");
+  $("creatorPreview").classList.toggle("char-female",gender==="feminino");
+}
+
+function openCreator(){
+  $("characterCreator").classList.add("show");
+  selectGender(selectedGender);
+  setTimeout(()=>$("characterName").focus(),100);
+}
+
+window.createCharacter=function(){
+  const name=$("characterName").value.trim();
+  if(name.length<2){
+    $("creatorError").textContent="Escolha um nome com pelo menos 2 letras.";
+    return;
+  }
+  state.characterName=name;
+  state.gender=selectedGender;
+  state.initialized=true;
+  localStorage.setItem("terafim_character_name",name);
+  localStorage.setItem("terafim_gender",selectedGender);
+  localStorage.setItem("terafim_initialized","1");
+  $("characterCreator").classList.remove("show");
+  $("creatorError").textContent="";
+  bubble("Bem-vindo, "+name+"! ✨");
+  render();
+};
 
 function render(){
   $("coins").textContent=state.coins;
+  $("playerName").textContent=state.characterName||"Aprendiz";
+  $("playerBadge").textContent=(state.characterName||"Aprendiz")+" • "+(state.gender==="feminino"?"Aprendiz":"Aprendiz");
   ["health","hunger","energy"].forEach(k=>{
     $(k+"Txt").textContent=clamp(state[k]);
     $(k+"Bar").style.width=clamp(state[k])+"%";
@@ -277,7 +397,7 @@ window.feed=function(){
 
 window.play=function(){
   if(state.sleeping){bubble("Zzz... 😴");return}
-  if(state.energy<12){bubble("Estou cansado... ⚡");toast("Nimo precisa descansar.");return}
+  if(state.energy<12){bubble("Estou cansado... ⚡");toast("Terafim precisa descansar.");return}
   state.energy-=12;
   state.hunger-=5;
   state.health+=1;
@@ -292,12 +412,12 @@ window.sleepToggle=function(){
   state.sleeping=!state.sleeping;
   if(state.sleeping){
     bubble("Boa noite! 🌙");
-    toast("Nimo foi dormir.");
+    toast("Terafim foi dormir.");
   }else{
     state.energy+=35;
     state.health+=5;
     bubble("Bom dia! ☀️");
-    toast("Nimo descansou!");
+    toast("Terafim descansou!");
   }
   render();
 };
@@ -315,23 +435,23 @@ window.bath=function(){
 
 window.talk=function(){
   const phrases=[
-    "Você é meu melhor amigo! 💜",
+    "Vamos juntos nessa jornada! ✨",
     "Vamos brincar? 🎮",
     "Estou com fome... 🍎",
     "Que dia bonito! ☀️",
     "Quero uma aventura! ✨",
-    "Você viu minhas orelhinhas? 😄"
+    "Pronto para treinar comigo? ⚔️"
   ];
   bubble(phrases[Math.floor(Math.random()*phrases.length)]);
   bounce();
 };
 
 window.shop=function(){
-  $("modalTitle").textContent="🛍️ Loja do Nimo";
+  $("modalTitle").textContent="🛍️ Loja do Terafim";
   $("modalContent").innerHTML=`
     <div class="grid">
       <div class="card"><div class="icon">🍎</div><b>Maçã</b><p>Adiciona 1 comida ao estoque.</p><span class="price">🪙 10</span><button onclick="buyApple()">Comprar</button></div>
-      <div class="card"><div class="icon">🍕</div><b>Pizza</b><p>Nimo come na hora e recupera 30 de fome.</p><span class="price">🪙 25</span><button onclick="buyPizza()">Comer</button></div>
+      <div class="card"><div class="icon">🍕</div><b>Pizza</b><p>Terafim come na hora e recupera 30 de fome.</p><span class="price">🪙 25</span><button onclick="buyPizza()">Comer</button></div>
       <div class="card"><div class="icon">🎩</div><b>Chapéu Neon</b><p>Item cosmético exclusivo.</p><span class="price">🪙 80</span><button onclick="buyItem('Chapéu Neon',80)">Comprar</button></div>
       <div class="card"><div class="icon">🛹</div><b>Skate Lunar</b><p>Item cosmético exclusivo.</p><span class="price">🪙 120</span><button onclick="buyItem('Skate Lunar',120)">Comprar</button></div>
     </div>`;
@@ -403,8 +523,8 @@ window.missions=function(){
   $("modalContent").innerHTML=`
     <div class="mission"><span class="icon">🍎</span><p>Tenha 3 comidas no estoque<br><b>${Math.min(state.food,3)}/3</b></p><strong>🪙 20</strong></div>
     <div class="mission"><span class="icon">🎮</span><p>Brinque ou vença 5 partidas<br><b>${Math.min(state.plays,5)}/5</b></p><strong>🪙 30</strong></div>
-    <div class="mission"><span class="icon">🛁</span><p>Dê um banho em Nimo<br><b>${Math.min(state.baths,1)}/1</b></p><strong>🪙 15</strong></div>
-    <div class="card"><b>Como jogar</b><p>Cuide do Nimo todos os dias. Comida aumenta a fome, brincadeiras gastam energia, banho recupera saúde e dormir recupera energia.</p></div>`;
+    <div class="mission"><span class="icon">🛁</span><p>Dê um banho em Terafim<br><b>${Math.min(state.baths,1)}/1</b></p><strong>🪙 15</strong></div>
+    <div class="card"><b>Como jogar</b><p>Cuide do Terafim todos os dias. Comida aumenta a fome, brincadeiras gastam energia, banho recupera saúde e dormir recupera energia.</p></div>`;
   $("modal").classList.add("show");
 };
 
@@ -429,6 +549,7 @@ setInterval(()=>{
 },5000);
 
 render();
+if(!state.initialized) openCreator();
 })();
 </script>
 </body>
